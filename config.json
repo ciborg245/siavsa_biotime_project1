@@ -1,0 +1,8 @@
+{
+    "PORT": "8200",
+    "DB_Username": "sa",
+    "DB_Password": "ale051996",
+    "DB_Database": "zkteco_biotime",
+    "DB_Host": "localhost",
+    "DB_Port": 51401
+}
