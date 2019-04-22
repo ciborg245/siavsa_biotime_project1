@@ -59,7 +59,9 @@ const generalKeys = [
     "Retardo de Descanso",
     "Retardo Total",
     "Ausencia",
-    "Marcaje Pendiente de Descanso",
+    // "Marcaje Pendiente de Descanso",
+    "Marcaje Pendiente de Salida a Descanso",
+    "Marcaje Pendiente de Entrada de Descanso",
     "Marcaje Pendiente de Entrada",
     "Marcaje Pendiente de Salida",
     "T.E. Normal",
@@ -115,7 +117,11 @@ const retardosKeys = [
     "Nombre de Dispositivo",
     "Departamento",
     "Fecha",
+    "Entrada",
+    "Hora de Entrada",
     "Retardo de Entrada",
+    "Salida a Descanso",
+    "Entrada de Descanso",
     "Retardo de Descanso",
     "Retardo Total"
 ]
@@ -140,7 +146,9 @@ const titleWidths = {
     "Retardo de Descanso": 15,
     "Retardo Total": 12,
     "Ausencia" : 12,
-    "Marcaje Pendiente de Descanso": 20,
+    // "Marcaje Pendiente de Descanso": 20,
+    "Marcaje Pendiente de Salida a Descanso": 25,
+    "Marcaje Pendiente de Entrada de Descanso": 25,
     "Marcaje Pendiente de Entrada": 20,
     "Marcaje Pendiente de Salida": 20,
     "T.E. Normal": 12,
@@ -160,11 +168,17 @@ excel.parseToExcel = function(data) {
     var wsRetardos = wb.addWorksheet('Retardos');
 
     wsGeneral.row(1).setHeight(35);
+    wsGeneral.row(1).freeze();
     wsAusencias.row(1).setHeight(35);
+    wsAusencias.row(1).freeze();
     wsTemprana.row(1).setHeight(35);
+    wsTemprana.row(1).freeze();
     wsExtras.row(1).setHeight(35);
+    wsExtras.row(1).freeze();
     wsPermisos.row(1).setHeight(35);
+    wsPermisos.row(1).freeze();
     wsRetardos.row(1).setHeight(35);
+    wsRetardos.row(1).freeze();
 
     for (let i = 0; i < generalKeys.length; i++) {
         wsGeneral.column(i + 1).setWidth(titleWidths[generalKeys[i]]);

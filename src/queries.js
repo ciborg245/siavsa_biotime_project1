@@ -73,6 +73,8 @@ queries.dailyReport = async function() {
                 5 as "Retardo Total",
                 dbo.attshifts.Absent as "Ausencia",
                 5 as "Marcaje Pendiente de Descanso",
+                5 as "Marcaje Pendiente de Salida a Descanso",
+                5 as "Marcaje Pendiente de Entrada de Descanso",
                 dbo.attshifts.NoIn as "Marcaje Pendiente de Entrada",
                 dbo.attshifts.NoOut as "Marcaje Pendiente de Salida",
                 dbo.attshifts.OverTime as "T.E. Normal",

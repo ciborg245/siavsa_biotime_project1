@@ -1,3 +1,9 @@
+#info
+info.ke
+
+#excel
+*.xlsx
+
 # Logs
 logs
 *.log

@@ -1,5 +1,6 @@
 const cron      = require('node-cron')
-const queries   = require('./queries')
+// const queries   = require('./queries')
+const queries   = require('../controllers/defaultReport')
 const nodemailer = require('nodemailer')
 const fs        = require('fs')
 const crypto    = require('crypto')
@@ -50,38 +51,6 @@ let mailOptionsError = {
     html: "<HTML>Hubo un error al generar el reporte.</HTML>"
 }
 
-// async function sendMail() {
-//     try {
-//         // let account = await nodemailer.createTestAccount();
-//         //
-//         // let transporter = nodemailer.createTransport(
-//         //     {
-//         //         host: account.smtp.host,
-//         //         port:account.smtp.port,
-//         //         secure: account.smtp.secure,
-//         //         auth: {
-//         //             user: account.user,
-//         //             pass: account.pass
-//         //         },
-//         //         logger: false,
-//         //         debug: false
-//         //     },
-//         //     {
-//         //         from: 'Saivsa Test <no-reply@siavsa.com>'
-//         //     }
-//         // )
-//
-//         let info = await transport.sendMail(mailOptions)
-//
-//
-//         console.log('Message sent')
-//         console.log(nodemailer.getTestMessageUrl(info))
-//
-//     } catch (err) {
-//         console.log(err);
-//     }
-// }
-
 module.exports = ScheduleReport;
 
 //Se crea la clase ScheduleReport que tiene el objetivo de realizar una tarea calendarizada
@@ -96,21 +65,21 @@ ScheduleReport.prototype.newSchedule = function(hour, minute) {
     this.hour = hour;
     this.minute = minute;
 
-    this.task = cron.schedule(`${this.minute} ${this.hour} * * *`, () => {
+    // this.task = cron.schedule(`${this.minute} ${this.hour} * * *`, () => {
     // this.task = cron.schedule('*/30 * * * * *', () => {
         queries.dailyReport().then(path => {
             console.log("Report created.");
-            mailOptions.attachments[0].path = path;
-            transport.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.log(error)
-                }
-                console.log(`Mail sent with \n  ${info.response}`)
-            })
+            // mailOptions.attachments[0].path = path;
+            // transport.sendMail(mailOptions, (error, info) => {
+            //     if (error) {
+            //         console.log(error)
+            //     }
+            //     console.log(`Mail sent with \n  ${info.response}`)
+            // })
         }).catch(err => {
             console.log(err)
         })
-    })
+    // })
 }
 
 ScheduleReport.prototype.destroyTask = function() {

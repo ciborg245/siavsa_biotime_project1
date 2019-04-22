@@ -7,6 +7,7 @@ function numToHour(num) {
 //Funcion para formatear los datos de la DB para el reporte
 format.parseToFormat = function(query) {
     res = []
+    if (query.recordset.length == 0) return []
     const  keys = Object.keys(query.recordset[0]);
 
     for (i in query.recordset) {
@@ -64,7 +65,7 @@ format.parseToFormat = function(query) {
                         if (diff > 0) {
                             elem[key] = numToHour(diff);
                             elem.isCheckoutEarly = true;
-                            leTime += diff;
+                            // leTime += diff;
                         } else {
                             elem[key] = "-";
                             elem.isCheckoutEarly = false;
@@ -78,7 +79,13 @@ format.parseToFormat = function(query) {
                 case "Retardo de Descanso":
                     if (elem["Tiempo de Descanso"] != 0) {
                         if (elem["Salida a Descanso"] == "" || elem["Entrada de Descanso"] == "") {
-                            elem["Marcaje Pendiente de Descanso"] = "Si";
+                            if (elem["Salida a Descanso"] == "") {
+                                elem["Marcaje Pendiente de Salida a Descanso"] = "X";
+                            }
+                            if (elem["Entrada de Descanso"] == "") {
+                                elem["Marcaje Pendiente de Entrada de Descanso"] = "X";
+                            }
+                            // elem["Marcaje Pendiente de Descanso"] = "Si";
                             elem[key] = "-";
                             elem.isBreakLate = false;
                         } else {
@@ -113,18 +120,20 @@ format.parseToFormat = function(query) {
                 //     let totalExtra = exTime - leTime;
                 //     elem[key] = totalExtra > 0 ? totalExtra : 0;
                 //     break;
-                case "Marcaje Pendiente de Descanso":
+                // case "Marcaje Pendiente de Descanso":
+                case "Marcaje Pendiente de Salida a Descanso":
+                case "Marcaje Pendiente de Entrada de Descanso":
                     if (!elem.hasOwnProperty(key)) {
                         elem[key] = ""
                     }
                     break;
                 case "Marcaje Pendiente de Entrada":
                 case "Marcaje Pendiente de Salida":
-                    elem[key] = entry == 1 ? "Si" : ""
+                    elem[key] = entry == 1 ? "X" : ""
                     break;
                 case "Ausencia":
                     if (entry > 0) {
-                        elem[key] = "Si"
+                        elem[key] = "X"
                     } else {
                         elem[key] = ""
                     }

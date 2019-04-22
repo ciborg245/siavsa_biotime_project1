@@ -6,13 +6,20 @@
 const express   = require('express')
 const fs        = require("fs")
 const crypto    = require("crypto")
+var cors = require('cors')
 const routes    = require('../router/router')
+const bodyParser = require('body-parser');
 var sql         = require("mssql")
 
 var app         = express()
 const ScheduleReport = require('../src/schedule_report')
 
 // **** CONFIGURACIONES INICIALES ***
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(bodyParser.json());
+app.use(cors())
 
 const CONFIG_PATH = './config.json' //Path del archivo de configuraciones
 const SCHEDULE_PATH = './data/schedule.json'

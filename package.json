@@ -10,6 +10,8 @@
   "author": "Alejandro Chaclan",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
     "excel4node": "^1.7.0",
     "express": "^4.16.4",
     "mssql": "^5.0.3",
