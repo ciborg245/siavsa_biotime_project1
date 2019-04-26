@@ -1,11 +1,12 @@
 const cron      = require('node-cron')
 // const queries   = require('./queries')
-const queries   = require('../controllers/defaultReport')
+const queries   = require('../controllers/defaultReportController')
 const nodemailer = require('nodemailer')
 const fs        = require('fs')
 const crypto    = require('crypto')
 
 const INFO_PATH = './data/info.ke'
+const EMAILS_PATH = './data/emails.json'
 
 //Se decodifica informacion sensible
 try {
@@ -32,26 +33,45 @@ let transport = nodemailer.createTransport(
     }
 )
 
-let mailOptions = {
-    to: 'alejandrochgu@gmail.com',
-    subject: "Reporte diario de Biotime",
-    text: "Reporte diario de Biotime.",
-    html: "<HTML>Reporte diario de Biotime.</HTML>",
-    attachments: [
-        {
-            path: ""
-        }
-    ]
-}
-
-let mailOptionsError = {
-    to: 'alejandrochgu@gmail.com',
-    subject: "Reporte diario de Biotime",
-    text: "Hubo un error al generar el reporte.",
-    html: "<HTML>Hubo un error al generar el reporte.</HTML>"
-}
-
 module.exports = ScheduleReport;
+
+function createMailInfo(to) {
+    return {
+        to: to,
+        subject: "Reporte diario de Biotime",
+        text: "Reporte diario de Biotime.",
+        html: "<HTML>Reporte diario de Biotime.</HTML>",
+        attachments: [
+            {
+                path: ""
+            }
+        ]
+    }
+}
+
+// let mailOptions = {
+//     to: 'alejandrochgu@gmail.com',
+//     subject: "Reporte diario de Biotime",
+//     text: "Reporte diario de Biotime.",
+//     html: "<HTML>Reporte diario de Biotime.</HTML>",
+//     attachments: [
+//         {
+//             path: ""
+//         }
+//     ]
+// }
+
+async function sendMail(to, path) {
+    try {
+        let mailOptions = createMailInfo(to);
+        mailOptions.attachments[0].path = path;
+
+        mailResponse = await transport.sendMail(mailOptions);
+        console.log(mailResponse)
+    } catch (err) {
+        console.error(err)
+    }
+}
 
 //Se crea la clase ScheduleReport que tiene el objetivo de realizar una tarea calendarizada
 function ScheduleReport() {
@@ -69,13 +89,13 @@ ScheduleReport.prototype.newSchedule = function(hour, minute) {
     // this.task = cron.schedule('*/30 * * * * *', () => {
         queries.dailyReport().then(path => {
             console.log("Report created.");
-            // mailOptions.attachments[0].path = path;
-            // transport.sendMail(mailOptions, (error, info) => {
-            //     if (error) {
-            //         console.log(error)
-            //     }
-            //     console.log(`Mail sent with \n  ${info.response}`)
-            // })
+            fs.readFile(EMAILS_PATH, (err, data) => {
+                var emails = JSON.parse(data).emails;
+                for (const email of emails) {
+                    console.log(email)
+                    // sendMail(email, path)
+                }
+            })
         }).catch(err => {
             console.log(err)
         })
