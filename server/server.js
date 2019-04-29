@@ -14,6 +14,7 @@ var sql         = require("mssql")
 var app         = express()
 const ScheduleReport = require('../src/schedule_report')
 
+
 // **** CONFIGURACIONES INICIALES ***
 app.use(bodyParser.urlencoded({
   extended: true
@@ -21,6 +22,8 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.use(cors())
 app.use(express.static('./dist/', {index: 'index.html'}))
+
+
 
 const CONFIG_PATH = './config.json' //Path del archivo de configuraciones
 const SCHEDULE_PATH = './data/schedule.json'
@@ -50,19 +53,7 @@ try {
 var SCHEDULE_HOUR = scheduleDataJSON['hour'];
 var SCHEDULE_MINUTE = scheduleDataJSON['minute'];
 
-// **** CONFIGURACIONES INICIALES ****
-// secret = "siavsabiotime"
-// const cipher = crypto.createCipher('aes192', 'crunchy');
-// var encrypted = cipher.update(secret, 'utf8', 'hex');
-// encrypted += cipher.final('hex');
-// console.log(encrypted);
-//
-// fs.writeFileSync('./data/info.ke', encrypted)
 
-// const decipher = crypto.createDecipher('aes192', 'crunchy');
-// var decrypted = decipher.update(encrypted, 'hex', 'utf8');
-// decrypted += decipher.final('utf8');
-// console.log(decrypted)
 // Se crea la tarea del reporte diario
 scheduleReport = new ScheduleReport();
 scheduleReport.newSchedule(SCHEDULE_HOUR, SCHEDULE_MINUTE);

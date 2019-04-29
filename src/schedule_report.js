@@ -1,39 +1,26 @@
 const cron      = require('node-cron')
-// const queries   = require('./queries')
 const queries   = require('../controllers/defaultReportController')
 const nodemailer = require('nodemailer')
 const fs        = require('fs')
 const crypto    = require('crypto')
 
-const INFO_PATH = './data/info.ke'
+const INFO_PATH = './data/info.json'
 const EMAILS_PATH = './data/emails.json'
-
-//Se decodifica informacion sensible
-try {
-    const info = fs.readFileSync(INFO_PATH, "utf8");
-    const decipher = crypto.createDecipher('aes192', 'crunchy');
-    var pass = decipher.update(info, 'hex', 'utf8');
-    pass += decipher.final('utf8');
-} catch (err) {
-    console.log(err)
-    console.log('Hubo un error al leer el archivo de informacion. Por favor verificar que esté correcto.')
-}
-
-//Se crean los atributos necesarios para el envio de email
-let transport = nodemailer.createTransport(
-    {
-        service: 'Gmail',
-        auth: {
-            user: 'siavsa.reports@gmail.com',
-            pass: pass
-        },
-    },
-    {
-        from: '"Siavsa Report" <siavsa.reports@gmail.com'
-    }
-)
+const RRC_PATH = './reports/requested'
 
 module.exports = ScheduleReport;
+
+function createTransport(email, pass) {
+    return nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: email,
+            pass: pass
+        },
+    }, {
+        from: `"Siavsa Report" <${email}>`
+    })
+}
 
 function createMailInfo(to) {
     return {
@@ -49,19 +36,7 @@ function createMailInfo(to) {
     }
 }
 
-// let mailOptions = {
-//     to: 'alejandrochgu@gmail.com',
-//     subject: "Reporte diario de Biotime",
-//     text: "Reporte diario de Biotime.",
-//     html: "<HTML>Reporte diario de Biotime.</HTML>",
-//     attachments: [
-//         {
-//             path: ""
-//         }
-//     ]
-// }
-
-async function sendMail(to, path) {
+async function sendMail(transport, to, path) {
     try {
         let mailOptions = createMailInfo(to);
         mailOptions.attachments[0].path = path;
@@ -88,17 +63,43 @@ ScheduleReport.prototype.newSchedule = function(hour, minute) {
     // this.task = cron.schedule(`${this.minute} ${this.hour} * * *`, () => {
     // this.task = cron.schedule('*/30 * * * * *', () => {
         queries.dailyReport().then(path => {
-            fs.readFile(EMAILS_PATH, (err, data) => {
-                var emails = JSON.parse(data).emails;
-                for (const email of emails) {
-                    console.log(email)
-                    // sendMail(email, path)
-                }
+            fs.readFile(INFO_PATH, (err, data) => {
+                if (err) throw err;
+
+                var dataJSON = JSON.parse(data);
+
+                const decipher = crypto.createDecipher('aes192', 'crunchy');
+                var pass = decipher.update(dataJSON.password, 'hex', 'utf8');
+                pass += decipher.final('utf8');
+
+
+                var transport = createTransport(dataJSON.email, pass)
+
+                fs.readFile(EMAILS_PATH, (err, data) => {
+                    var emails = JSON.parse(data).emails;
+                    for (const email of emails) {
+                        console.log(email)
+                        // sendMail(transport, email, path)
+                    }
+                })
             })
         }).catch(err => {
             console.log(err)
         })
     // })
+
+    deleteTask = cron.schedule(`55 23 * * *`, () => {
+        fs.readdir(RRC_PATH, (err, files) => {
+            if (err) throw err;
+
+            for (const file of files) {
+                fs.unlink(RRC_PATH + `/${file}`, err => {
+                  if (err) throw err;
+                  console.log(`DELETED ${file}`)
+                });
+            }
+        });
+    })
 }
 
 ScheduleReport.prototype.destroyTask = function() {
