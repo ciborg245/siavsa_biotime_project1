@@ -6,7 +6,7 @@
 const express   = require('express')
 const fs        = require("fs")
 const crypto    = require("crypto")
-var cors = require('cors')
+const cors      = require('cors')
 const routes    = require('../router/router')
 const bodyParser = require('body-parser');
 var sql         = require("mssql")
@@ -20,6 +20,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 app.use(cors())
+app.use(express.static('./dist/', {index: 'index.html'}))
 
 const CONFIG_PATH = './config.json' //Path del archivo de configuraciones
 const SCHEDULE_PATH = './data/schedule.json'

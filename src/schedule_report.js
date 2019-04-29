@@ -88,7 +88,6 @@ ScheduleReport.prototype.newSchedule = function(hour, minute) {
     // this.task = cron.schedule(`${this.minute} ${this.hour} * * *`, () => {
     // this.task = cron.schedule('*/30 * * * * *', () => {
         queries.dailyReport().then(path => {
-            console.log("Report created.");
             fs.readFile(EMAILS_PATH, (err, data) => {
                 var emails = JSON.parse(data).emails;
                 for (const email of emails) {

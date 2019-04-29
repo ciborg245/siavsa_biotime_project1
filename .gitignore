@@ -1,5 +1,7 @@
 #info
 info.ke
+emails.json
+dist/
 
 #excel
 *.xlsx

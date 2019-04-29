@@ -2,6 +2,9 @@ const format    = require("../src/format")
 const excel     = require('../src/excel')
 const fs        = require("fs")
 const sql       = require("mssql")
+const uuidv4    = require('uuid/v4');
+
+uuidv4(); // ⇨ '10ba038e-48da-487b-96e8-8d3b99b6d18a'
 
 var defaultReportController = {}
 
@@ -58,8 +61,8 @@ function getDBConfig() {
 defaultReportController.byDateByUsers = async function(req, res) {
     await pool1Connect
     try {
-        console.log(req.query)
-        let body = req.query
+        console.log(req.query);
+        let body = req.query;
         let query =`SELECT
                 dbo.userinfo.badgenumber as "No. de Usuario",
                 dbo.userinfo.name as "Nombre",
@@ -96,21 +99,46 @@ defaultReportController.byDateByUsers = async function(req, res) {
                 group by employee_id) d1 ON d1.employee_id = dbo.userinfo.userid
             JOIN dbo.personnel_area ON d1.area_id = dbo.personnel_area.id
             WHERE AttDate >= '${body.startDate}' AND AttDate <= '${body.endDate}'
-            AND dbo.userinfo.isblacklist IS NULL AND (dbo.attshifts.WorkDay = 1 OR dbo.attshifts.Symbol = 'V')
-            `
+            AND dbo.userinfo.isblacklist IS NULL AND (dbo.attshifts.WorkDay = 1 OR dbo.attshifts.Symbol = 'V')`
 
+        if (body.users) {
+            let users = body.users;
 
-            const request = new sql.Request(pool1);
-        	let result = await request.query(query)
+            if (users.length > 0) {
+                query += `\nAND( dbo.userinfo.userid = ${users[0]}`;
 
+                users.splice(0, 1);
 
-            formattedData = format.parseToFormat(result);
-            res.send(formattedData)
-            return excel.parseToExcel(formattedData);
+                for (const user of users) {
+                    query += ` OR dbo.userinfo.userid = ${user}`
+                }
+
+                query += ')'
+            }
+        }
+
+        // console.log(query)
+
+        const request = new sql.Request(pool1);
+    	let result = await request.query(query);
+        formattedData = format.parseToFormat(result);
+
+        uuid = uuidv4();
+        let excel_path = `./reports/requested/${uuid}.xlsx`;
+        excel.parseToExcel(formattedData, excel_path);
+        console.log(`Created: ${excel_path}`);
+
+        response = {
+            message: 'OK',
+            uuid: uuid,
+            data: formattedData
+        }
+
+        res.send(response)
 
     } catch (err) {
-        await sql.close()
-        console.log(err)
+        // await sql.close()
+        console.error(err)
     }
 }
 
@@ -166,12 +194,15 @@ defaultReportController.dailyReport = async function() {
 
         const request = await new sql.Request(pool1)
         const result = await request.query(query)
-        // await sql.close()
         formattedData = format.parseToFormat(result);
-        // console.log("Success");
-        return excel.parseToExcel(formattedData);
+
+
+        let excel_path = `./reports/daily/Reporte-${currentDate.getDate()}-${(currentDate.getMonth()+1)}-${currentDate.getFullYear()}.xlsx`;
+        excel.parseToExcel(formattedData, excel_path);
+        console.log("Daily report created.");
+
+        return excel_path
     } catch (err) {
-        res.send([])
         console.log(err);
         return null
     }
@@ -184,11 +215,13 @@ defaultReportController.getUsers = async function(req, res) {
         let query = `
             SELECT
                 dbo.userinfo.badgenumber as badgenumber,
+				dbo.userinfo.lastname + ', ' + dbo.userinfo.name as name,
                 dbo.userinfo.name as firstname,
                 dbo.userinfo.lastname as lastname,
                 dbo.userinfo.userid as id
             FROM dbo.userinfo
             WHERE dbo.userinfo.isblacklist IS NULL
+			order by dbo.userinfo.lastname
         `
         console.log('Users requested.')
         const request = await new sql.Request(pool1)
@@ -201,6 +234,16 @@ defaultReportController.getUsers = async function(req, res) {
         res.send([])
     }
 
+}
+
+defaultReportController.downloadExcelFromId = function(req, res) {
+
+    console.log(req.query)
+    let body = req.query;
+    var file = process.cwd() + `\\reports\\requested\\${body.uuid}.xlsx`;
+
+    console.log(`Requested: ${file}`);
+    res.download(file);
 }
 
 module.exports = defaultReportController

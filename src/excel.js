@@ -155,7 +155,7 @@ const titleWidths = {
     "Permiso": 12
 }
 
-excel.parseToExcel = function(data) {
+excel.parseToExcel = function(data, path) {
     var wb = new xl.Workbook();
 
     let sheets = [];
@@ -248,7 +248,7 @@ excel.parseToExcel = function(data) {
                     .number(cellData)
                     .style(normalStyle)
 
-                if (data[i]["Ausencia"] == "Si") {
+                if (data[i]["Ausencia"] == "X") {
                     temp = ausenciasKeys.indexOf(generalKeys[j]);
 
                     if (temp > -1) {
@@ -314,7 +314,7 @@ excel.parseToExcel = function(data) {
                     .string(cellData)
                     .style(style)
 
-                if (data[i]["Ausencia"] == "Si") {
+                if (data[i]["Ausencia"] == "X") {
                     temp = ausenciasKeys.indexOf(generalKeys[j]);
 
                     if (temp > -1) {
@@ -362,7 +362,7 @@ excel.parseToExcel = function(data) {
             }
         }
 
-        if (data[i]["Ausencia"] == "Si")
+        if (data[i]["Ausencia"] == "X")
             ausenciaCont++;
         if (data[i].isCheckoutEarly)
             tempranaCont++;
@@ -374,15 +374,10 @@ excel.parseToExcel = function(data) {
             retardosCont++;
     }
 
-    var today = new Date();
-    let excel_path = `./reports/Report-${today.getDate()}-${(today.getMonth()+1)}-${today.getFullYear()}.xlsx`;
-    // try {
-        wb.write(excel_path)
-        return excel_path
-    // } catch (err) {
-    //     console.log(err)
-    //     return null
-    // }
+    // var today = new Date();
+    // let excel_path = `./reports/Report-${today.getDate()}-${(today.getMonth()+1)}-${today.getFullYear()}.xlsx`;
+
+    wb.write(path)
 }
 
 module.exports = excel;
