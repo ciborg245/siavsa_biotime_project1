@@ -156,6 +156,7 @@ const titleWidths = {
 }
 
 excel.parseToExcel = function(data, path) {
+    console.log(data.length)
     var wb = new xl.Workbook();
 
     let sheets = [];
@@ -167,6 +168,28 @@ excel.parseToExcel = function(data, path) {
     var wsPermisos = wb.addWorksheet('Permisos');
     var wsRetardos = wb.addWorksheet('Retardos');
 
+    // wsGeneral.cell(1, 1, 1, 3, true)
+    // wsGeneral.row(1).setHeight(35);
+    // wsGeneral.addImage({
+    //   path: './assets/siavsa.png',
+    //   type: 'picture',
+    //   position: {
+    //     type: 'twoCellAnchor',
+    //     from: {
+    //       col: 2,
+    //       colOff: 0,
+    //       row: 1,
+    //       rowOff: 0,
+    //     },
+    //     to: {
+    //       col: 3,
+    //       colOff: 0,
+    //       row: 2,
+    //       rowOff: 0,
+    //     },
+    //   },
+    // });
+    wsStartRow = 2;
     wsGeneral.row(1).setHeight(35);
     wsGeneral.row(1).freeze();
     wsAusencias.row(1).setHeight(35);
@@ -244,7 +267,7 @@ excel.parseToExcel = function(data, path) {
             if (typeof cellData == 'number') {
                 style = normalStyle;
 
-                wsGeneral.cell(i + 2, j + 1)
+                wsGeneral.cell(i + wsStartRow, j + 1)
                     .number(cellData)
                     .style(normalStyle)
 
@@ -310,7 +333,7 @@ excel.parseToExcel = function(data, path) {
                     }
                 }
 
-                wsGeneral.cell(i + 2, j + 1)
+                wsGeneral.cell(i + wsStartRow, j + 1)
                     .string(cellData)
                     .style(style)
 
