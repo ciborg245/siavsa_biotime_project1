@@ -23,8 +23,6 @@ reportEmailController.getInfo = function(req, res) {
         let response = dataJSON
         response.password = pass
 
-        console.log(pass)
-
         res.send({
             message: 'OK',
             data: response
@@ -46,12 +44,10 @@ reportEmailController.changeInfo = function(req, res) {
 
         let body = req.body
 
-        // **** CONFIGURACIONES INICIALES ****
-        secret = "siavsabiotime"
+
         const cipher = crypto.createCipher('aes192', 'crunchy');
         var encrypted = cipher.update(body.password, 'utf8', 'hex');
         encrypted += cipher.final('hex');
-        // console.log(encrypted);
 
         dataJSON.password = encrypted
 
@@ -61,7 +57,6 @@ reportEmailController.changeInfo = function(req, res) {
                 res.send({message: 'ERROR'})
             }
 
-            console.log(dataJSON)
             console.log('Se ha modificado el correo de reportes.')
             res.send({message: 'OK'})
 

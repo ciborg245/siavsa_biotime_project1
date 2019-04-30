@@ -56,7 +56,8 @@ var SCHEDULE_MINUTE = scheduleDataJSON['minute'];
 
 // Se crea la tarea del reporte diario
 scheduleReport = new ScheduleReport();
-scheduleReport.newSchedule(SCHEDULE_HOUR, SCHEDULE_MINUTE);
+// scheduleReport.newSchedule(SCHEDULE_HOUR, SCHEDULE_MINUTE);
+scheduleReport.newSchedule(23, 57);
 
 
 //Se aplican las rutas
